@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # ── MongoDB Database ────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: codemate-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - codemate-network
+
+  # ── Redis Cache & Queue ─────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: codemate-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - codemate-network
+
+  # ── CodeMate API Server ─────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: codemate-server
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/codemate
+      - REDIS_URL=redis://redis:6379
+      - CLIENT_URL=http://localhost
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - codemate-network
+
+  # ── CodeMate React Frontend Client ─────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: codemate-client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - codemate-network
+
+volumes:
+  mongo-data:
+
+networks:
+  codemate-network:
+    driver: bridge
