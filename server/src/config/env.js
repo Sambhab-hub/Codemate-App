@@ -19,8 +19,8 @@ const config = {
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/codemate',
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'codemate_dev_jwt_secret_key_change_in_production_2026',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'codemate_dev_jwt_refresh_secret_key_change_in_production_2026',
+    secret: process.env.JWT_SECRET,
+    refreshSecret: process.env.JWT_REFRESH_SECRET,
     accessExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
     refreshExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   },

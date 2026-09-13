@@ -38,8 +38,6 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/codemate
       - REDIS_URL=redis://redis:6379
       - CLIENT_URL=http://localhost
-      - JWT_SECRET=codemate_docker_jwt_secret_key_2026
-      - JWT_REFRESH_SECRET=codemate_docker_jwt_refresh_secret_key_2026
     depends_on:
       - mongodb
       - redis
