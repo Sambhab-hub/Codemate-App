@@ -63,23 +63,24 @@ const callback = asyncHandler(async (req, res) => {
     let userId = stateParam;
 
     if (existingConnection) {
-      // GitHub account already linked → just log that user in directly
       userId = existingConnection.userId.toString();
       const user = await User.findById(userId);
-      if (!user) {
-        return res.redirect(`${config.clientUrl}/login?error=Associated+user+not+found`);
+      if (user) {
+        // Refresh the GitHub access token silently
+        await GitHubConnection.findOneAndUpdate(
+          { githubUserId: profile.githubUserId },
+          { accessToken, scopes: scope, githubAvatarUrl: profile.githubAvatarUrl },
+        );
+
+        // Issue a fresh login session
+        const refreshToken = authService.generateRefreshToken(user);
+        authService.setRefreshTokenCookie(res, refreshToken);
+        return res.redirect(`${config.clientUrl}/dashboard?status=connected`);
+      } else {
+        // Orphaned connection — User was deleted from DB, remove stale record
+        await GitHubConnection.deleteOne({ _id: existingConnection._id });
+        userId = 'guest';
       }
-
-      // Refresh the GitHub access token silently
-      await GitHubConnection.findOneAndUpdate(
-        { githubUserId: profile.githubUserId },
-        { accessToken, scopes: scope, githubAvatarUrl: profile.githubAvatarUrl },
-      );
-
-      // Issue a fresh login session
-      const refreshToken = authService.generateRefreshToken(user);
-      authService.setRefreshTokenCookie(res, refreshToken);
-      return res.redirect(`${config.clientUrl}/dashboard?status=connected`);
     }
 
     // 4. No existing GitHub connection — handle Guest / OAuth Sign-Up
