@@ -53,9 +53,36 @@ const callback = asyncHandler(async (req, res) => {
     // 2. Fetch GitHub profile
     const profile = await githubService.getGitHubUserProfile(accessToken);
 
+    const GitHubConnection = require('../models/GitHubConnection.model');
+
+    // 3. Check if this GitHub account is already linked to ANY CodeMate user
+    const existingConnection = await GitHubConnection.findOne({
+      githubUserId: profile.githubUserId,
+    });
+
     let userId = stateParam;
 
-    // 3. Handle Guest / OAuth Single Sign On
+    if (existingConnection) {
+      // GitHub account already linked → just log that user in directly
+      userId = existingConnection.userId.toString();
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.redirect(`${config.clientUrl}/login?error=Associated+user+not+found`);
+      }
+
+      // Refresh the GitHub access token silently
+      await GitHubConnection.findOneAndUpdate(
+        { githubUserId: profile.githubUserId },
+        { accessToken, scopes: scope, githubAvatarUrl: profile.githubAvatarUrl },
+      );
+
+      // Issue a fresh login session
+      const refreshToken = authService.generateRefreshToken(user);
+      authService.setRefreshTokenCookie(res, refreshToken);
+      return res.redirect(`${config.clientUrl}/dashboard?status=connected`);
+    }
+
+    // 4. No existing GitHub connection — handle Guest / OAuth Sign-Up
     if (!userId || userId === 'guest') {
       const email = `${profile.githubUsername.toLowerCase()}@github.com`;
       let user = await User.findOne({ email });
@@ -75,14 +102,14 @@ const callback = asyncHandler(async (req, res) => {
       authService.setRefreshTokenCookie(res, refreshToken);
     }
 
-    // 4. Save connection linked to userId
+    // 5. Save the new GitHub connection linked to userId
     await githubService.saveGitHubConnection(userId, {
       accessToken,
       scope,
       ...profile,
     });
 
-    // 5. Redirect back to frontend client app
+    // 6. Redirect to dashboard
     res.redirect(`${config.clientUrl}/dashboard?status=connected`);
   } catch (err) {
     console.error('GitHub OAuth Callback Error:', err.message);
