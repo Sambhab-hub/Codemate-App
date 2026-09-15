@@ -115,13 +115,4 @@ npm test
 
 ---
 
-## 🎤 Interview Defense Preparation Q&A
 
-**Q: Why use Redux Toolkit in memory for Access Tokens and HttpOnly Cookies for Refresh Tokens?**
-> Storing access tokens in `localStorage` or `sessionStorage` leaves them vulnerable to Cross-Site Scripting (XSS) attacks. By keeping short-lived access tokens in JS memory (Redux) and long-lived refresh tokens in `HttpOnly` cookies (which JavaScript cannot read), we protect against XSS token theft while supporting silent session refresh.
-
-**Q: How does the AI Code Review Engine ensure deterministic JSON responses?**
-> We use OpenAI's `response_format: { type: "json_object" }` alongside a strict system prompt instructing the model to act as a security auditor returning raw JSON matching our schema. We set a low `temperature` (0.2) for consistency and validate all parsed properties before persisting.
-
-**Q: How do you prevent blocking the main Node.js event loop during heavy operations?**
-> Heavy tasks like fetching diffs from GitHub and executing AI reviews are delegated to BullMQ background job queues powered by Redis. The Express API responds immediately with `202 Accepted`, allowing worker processes to handle jobs asynchronously. Upon completion, Socket.IO emits real-time notifications to the client browser.
