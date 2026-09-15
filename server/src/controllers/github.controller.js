@@ -9,31 +9,41 @@ const AppError = require('../utils/AppError');
  * GitHub Controllers — HTTP layer for GitHub integration.
  */
 
-// GET /api/github/auth — Returns GitHub OAuth authorization URL
+const User = require('../models/User.model');
+const authService = require('../services/auth.service');
+
+// GET /api/github/auth — Returns or redirects to GitHub OAuth authorization URL
 const getAuthUrl = asyncHandler(async (req, res) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId || 'guest';
 
   if (!config.github.clientId) {
     throw new AppError('GitHub OAuth is not configured on the server. Missing GITHUB_CLIENT_ID.', 500);
   }
 
   const url = githubService.getAuthorizationUrl(userId);
-  res.json({
-    success: true,
-    data: { url },
-  });
+
+  // If request accepts JSON or is XHR API call
+  if (req.headers.accept?.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest') {
+    return res.json({
+      success: true,
+      data: { url },
+    });
+  }
+
+  // Direct browser window navigation (from Login page "Continue with GitHub" button)
+  res.redirect(url);
 });
 
 // GET /api/github/callback — OAuth Callback endpoint registered with GitHub
 const callback = asyncHandler(async (req, res) => {
-  const { code, state: userId, error } = req.query;
+  const { code, state: stateParam, error } = req.query;
 
   if (error) {
-    return res.redirect(`${config.clientUrl}/github?error=${encodeURIComponent(error)}`);
+    return res.redirect(`${config.clientUrl}/login?error=${encodeURIComponent(error)}`);
   }
 
-  if (!code || !userId) {
-    return res.redirect(`${config.clientUrl}/github?error=Invalid_callback_params`);
+  if (!code) {
+    return res.redirect(`${config.clientUrl}/login?error=Invalid_callback_params`);
   }
 
   try {
@@ -43,18 +53,40 @@ const callback = asyncHandler(async (req, res) => {
     // 2. Fetch GitHub profile
     const profile = await githubService.getGitHubUserProfile(accessToken);
 
-    // 3. Save connection linked to userId
+    let userId = stateParam;
+
+    // 3. Handle Guest / OAuth Single Sign On
+    if (!userId || userId === 'guest') {
+      const email = `${profile.githubUsername.toLowerCase()}@github.com`;
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        user = new User({
+          name: profile.githubUsername,
+          email,
+        });
+        await user.save();
+      }
+
+      userId = user._id.toString();
+
+      // Issue refresh cookie for seamless browser login
+      const refreshToken = authService.generateRefreshToken(user);
+      authService.setRefreshTokenCookie(res, refreshToken);
+    }
+
+    // 4. Save connection linked to userId
     await githubService.saveGitHubConnection(userId, {
       accessToken,
       scope,
       ...profile,
     });
 
-    // 4. Redirect back to frontend client app
-    res.redirect(`${config.clientUrl}/github?status=connected`);
+    // 5. Redirect back to frontend client app
+    res.redirect(`${config.clientUrl}/dashboard?status=connected`);
   } catch (err) {
     console.error('GitHub OAuth Callback Error:', err.message);
-    res.redirect(`${config.clientUrl}/github?error=${encodeURIComponent(err.message)}`);
+    res.redirect(`${config.clientUrl}/login?error=${encodeURIComponent(err.message)}`);
   }
 });
 

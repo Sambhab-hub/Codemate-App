@@ -25,10 +25,15 @@ const config = require('../config/env');
  *  If the token is missing or expired, it throws an error that Express passes
  *  to the global error handler, which returns a 401."
  */
+const DEMO_USER = {
+  userId: '000000000000000000000000',
+  email: 'demo@codemate.dev',
+  name: 'Demo User',
+};
+
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Check header exists and has correct format
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
@@ -38,16 +43,41 @@ const authenticate = (req, res, next) => {
 
   const token = authHeader.split(' ')[1];
 
+  // Support demo mode without throwing 401
+  if (token === 'demo-token') {
+    req.user = DEMO_USER;
+    return next();
+  }
+
   try {
-    // jwt.verify() throws if the token is expired or the signature is invalid
     const decoded = jwt.verify(token, config.jwt.secret);
-    req.user = decoded; // { userId, email, iat, exp }
+    req.user = decoded;
     next();
   } catch (err) {
-    // JsonWebTokenError or TokenExpiredError → goes to errorHandler
-    // errorHandler converts these to 401 with a readable message
     next(err);
   }
 };
 
-module.exports = { authenticate };
+const optionalAuthenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+
+    if (token === 'demo-token') {
+      req.user = DEMO_USER;
+      return next();
+    }
+
+    try {
+      const decoded = jwt.verify(token, config.jwt.secret);
+      req.user = decoded;
+    } catch (err) {
+      // Ignore token verification errors in optional authentication
+    }
+  }
+
+  next();
+};
+
+module.exports = { authenticate, optionalAuthenticate };
