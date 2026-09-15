@@ -12,6 +12,9 @@ const { globalLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
+// Trust Nginx reverse proxy headers (X-Forwarded-For)
+app.set('trust proxy', 1);
+
 // ── 1. Security Headers (Helmet) ───────────────────────────────────────────────
 // Sets a dozen HTTP response headers to protect against common attacks:
 //   Content-Security-Policy  — prevents XSS by restricting where scripts can load from

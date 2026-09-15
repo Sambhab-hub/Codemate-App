@@ -13,13 +13,11 @@ const router = express.Router();
  * Auth Routes
  */
 
-router.use(authLimiter);
-
 // Public routes
-router.post('/register', registerRules, validate, authController.register);
-router.post('/login',    loginRules,    validate, authController.login);
-router.post('/refresh',                           authController.refresh);
-router.post('/logout',                            authController.logout);
+router.post('/register', authLimiter, registerRules, validate, authController.register);
+router.post('/login',    authLimiter, loginRules,    validate, authController.login);
+router.post('/refresh',                                         authController.refresh);
+router.post('/logout',                                          authController.logout);
 
 // Protected routes
 router.get('/me',         authenticate, authController.getMe);
