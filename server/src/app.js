@@ -68,15 +68,15 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Feature routes — uncommented as phases are completed:
-app.use('/api/auth', require('./routes/auth.routes'));        // Phase 4 ✅
-app.use('/api/github', require('./routes/github.routes'));    // Phase 5 ✅
-app.use('/api/repositories', require('./routes/repository.routes')); // Phase 6 ✅
-app.use('/api/pull-requests', require('./routes/pullRequest.routes')); // Phase 7 ✅
-app.use('/api/ai', require('./routes/ai.routes'));           // Phase 9 ✅
-app.use('/api/issues', require('./routes/issue.routes'));    // Phase 11 ✅
-app.use('/api/analytics', require('./routes/analytics.routes')); // Phase 12 ✅
-app.use('/api/webhooks', require('./routes/webhook.routes')); // Phase 14 ✅
+// Feature routes
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/github', require('./routes/github.routes'));
+app.use('/api/repositories', require('./routes/repository.routes'));
+app.use('/api/pull-requests', require('./routes/pullRequest.routes'));
+app.use('/api/ai', require('./routes/ai.routes'));
+app.use('/api/issues', require('./routes/issue.routes'));
+app.use('/api/analytics', require('./routes/analytics.routes'));
+app.use('/api/webhooks', require('./routes/webhook.routes'));
 
 // ── 7. 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {

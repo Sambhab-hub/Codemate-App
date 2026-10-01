@@ -4,26 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 
 /**
- * authenticate — protects routes that require a logged-in user.
- *
- * HOW IT WORKS:
- * 1. Reads the Authorization header: "Bearer eyJ..."
- * 2. Extracts the token after "Bearer "
- * 3. Verifies the signature with JWT_SECRET
- * 4. Attaches decoded payload to req.user for use in controllers
- * 5. Any error (expired, malformed, missing) → caught by errorHandler
- *
- * WHAT req.user CONTAINS:
- * { userId: "64abc...", email: "john@example.com", iat: ..., exp: ... }
- *
- * USAGE in routes:
- *   router.get('/me', authenticate, authController.getMe);
- *
- * INTERVIEW ANSWER:
- * "The auth middleware extracts the JWT from the Authorization header,
- *  verifies it with the secret key, and puts the decoded user info on req.user.
- *  If the token is missing or expired, it throws an error that Express passes
- *  to the global error handler, which returns a 401."
+ * Authentication Middleware — protects routes that require a logged-in user.
  */
 const DEMO_USER = {
   userId: '000000000000000000000000',
