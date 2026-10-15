@@ -129,9 +129,8 @@ const generateMockBugAnalysis = (description) => {
 const callGeminiWithFallback = async (client, params) => {
   const modelsToTry = [
     config.gemini.model,
-    'gemini-2.5-flash',
-    'gemini-1.5-flash',
-    'gemini-2.0-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.8-flash',
   ].filter(Boolean);
 
   let lastError = null;
@@ -144,8 +143,18 @@ const callGeminiWithFallback = async (client, params) => {
       return response;
     } catch (err) {
       lastError = err;
-      if (err.message && (err.message.includes('404') || err.message.includes('NOT_FOUND') || err.message.includes('is not found'))) {
-        console.warn(`Model ${model} not available, attempting fallback model...`);
+      const isRetryable = err.message && (
+        err.message.includes('404') ||
+        err.message.includes('NOT_FOUND') ||
+        err.message.includes('is not found') ||
+        err.message.includes('503') ||
+        err.message.includes('UNAVAILABLE') ||
+        err.message.includes('high demand') ||
+        err.message.includes('429') ||
+        err.message.includes('RESOURCE_EXHAUSTED')
+      );
+      if (isRetryable) {
+        console.warn(`Model ${model} unavailable (${err.message.slice(0, 80)}), trying fallback model...`);
         continue;
       }
       throw err;
