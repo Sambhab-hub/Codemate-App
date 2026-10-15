@@ -34,8 +34,13 @@ const config = {
     webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
   },
 
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY,
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  },
+
   openai: {
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY,
   },
 
   redis: {

@@ -1,23 +1,24 @@
 'use strict';
 
-const { OpenAI } = require('openai');
+const { GoogleGenAI } = require('@google/genai');
 const config = require('../config/env');
 const AppError = require('../utils/AppError');
 
 /**
- * AI Service — handles OpenAI API integration, prompt engineering, and response validation.
+ * AI Service — handles Google Gemini API integration, prompt engineering, and response validation.
  */
 
-// Initialize OpenAI client if API key is provided
-let openaiClient = null;
-if (config.openai.apiKey && config.openai.apiKey !== 'your_openai_api_key_here') {
-  openaiClient = new OpenAI({ apiKey: config.openai.apiKey });
+// Initialize Gemini client if API key is provided
+let geminiClient = null;
+const apiKey = config.gemini.apiKey;
+if (apiKey && apiKey !== 'your_gemini_api_key_here' && apiKey !== 'your_openai_api_key_here') {
+  geminiClient = new GoogleGenAI({ apiKey });
 }
 
 // ── PROMPT ENGINEERING ─────────────────────────────────────────────────────────
 
 /**
- * System prompt instructing OpenAI to act as a Principal Code Reviewer & Security Auditor.
+ * System prompt instructing Gemini to act as a Principal Code Reviewer & Security Auditor.
  */
 const PR_REVIEW_SYSTEM_PROMPT = `
 You are a Principal Software Engineer and Application Security Auditor.
@@ -49,7 +50,7 @@ You MUST respond strictly with valid JSON. Do not include markdown code block fo
 `.trim();
 
 /**
- * System prompt instructing OpenAI to conduct root-cause bug analysis.
+ * System prompt instructing Gemini to conduct root-cause bug analysis.
  */
 const BUG_ANALYSIS_SYSTEM_PROMPT = `
 You are a Staff Debugging Expert and System Architect.
@@ -123,15 +124,44 @@ const generateMockBugAnalysis = (description) => {
   };
 };
 
+// ── GEMINI API HELPER ──────────────────────────────────────────────────────────
+
+const callGeminiWithFallback = async (client, params) => {
+  const modelsToTry = [
+    config.gemini.model,
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+  ].filter(Boolean);
+
+  let lastError = null;
+  for (const model of [...new Set(modelsToTry)]) {
+    try {
+      const response = await client.models.generateContent({
+        ...params,
+        model,
+      });
+      return response;
+    } catch (err) {
+      lastError = err;
+      if (err.message && (err.message.includes('404') || err.message.includes('NOT_FOUND') || err.message.includes('is not found'))) {
+        console.warn(`Model ${model} not available, attempting fallback model...`);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
+};
+
 // ── CORE SERVICE FUNCTIONS ─────────────────────────────────────────────────────
 
 /**
- * Run AI Code Review on Pull Request files.
+ * Run AI Code Review on Pull Request files using Gemini.
  */
 const analyzePRCode = async (prDetails, files) => {
-  // If OpenAI client is not initialized, use smart mock response for seamless dev testing
-  if (!openaiClient) {
-    console.log('ℹ️  OpenAI API key not set — generating structured mock PR review');
+  if (!geminiClient) {
+    console.log('ℹ️  Gemini API key not set — generating structured mock PR review');
     return generateMockPRReview(prDetails, files);
   }
 
@@ -147,21 +177,19 @@ ${formattedFiles}
 `.trim();
 
   try {
-    const completion = await openaiClient.chat.completions.create({
-      model: 'gpt-4o-mini', // Fast, cost-effective model for code review
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: PR_REVIEW_SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.2, // Low temperature for deterministic analysis
-      max_tokens: 2500,
+    const response = await callGeminiWithFallback(geminiClient, {
+      contents: userPrompt,
+      config: {
+        systemInstruction: PR_REVIEW_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        temperature: 0.2,
+      },
     });
 
-    const content = completion.choices[0]?.message?.content;
-    const parsed = JSON.parse(content);
+    const rawText = response.text || '';
+    const cleaned = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+    const parsed = JSON.parse(cleaned);
 
-    // Basic structure validation
     return {
       overallScore: typeof parsed.overallScore === 'number' ? parsed.overallScore : 8.0,
       riskLevel: ['low', 'medium', 'high', 'critical'].includes(parsed.riskLevel) ? parsed.riskLevel : 'medium',
@@ -170,38 +198,37 @@ ${formattedFiles}
       testingRecommendations: Array.isArray(parsed.testingRecommendations) ? parsed.testingRecommendations : [],
     };
   } catch (err) {
-    console.error('OpenAI API Error during PR Review:', err.message);
+    console.error('Gemini API Error during PR Review:', err.message);
     throw new AppError(`AI Review failed: ${err.message}`, 500);
   }
 };
 
 /**
- * Run AI Bug Root-Cause Analysis.
+ * Run AI Bug Root-Cause Analysis using Gemini.
  */
 const analyzeBug = async (description) => {
   if (!description || !description.trim()) {
     throw new AppError('Bug description is required.', 400);
   }
 
-  if (!openaiClient) {
-    console.log('ℹ️  OpenAI API key not set — generating structured mock bug analysis');
+  if (!geminiClient) {
+    console.log('ℹ️  Gemini API key not set — generating structured mock bug analysis');
     return generateMockBugAnalysis(description);
   }
 
   try {
-    const completion = await openaiClient.chat.completions.create({
-      model: 'gpt-4o-mini',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: BUG_ANALYSIS_SYSTEM_PROMPT },
-        { role: 'user', content: `BUG DESCRIPTION:\n${description}` },
-      ],
-      temperature: 0.3,
-      max_tokens: 1500,
+    const response = await callGeminiWithFallback(geminiClient, {
+      contents: `BUG DESCRIPTION:\n${description}`,
+      config: {
+        systemInstruction: BUG_ANALYSIS_SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        temperature: 0.3,
+      },
     });
 
-    const content = completion.choices[0]?.message?.content;
-    const parsed = JSON.parse(content);
+    const rawText = response.text || '';
+    const cleaned = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+    const parsed = JSON.parse(cleaned);
 
     return {
       severity: ['low', 'medium', 'high', 'critical'].includes(parsed.severity) ? parsed.severity : 'medium',
@@ -211,7 +238,7 @@ const analyzeBug = async (description) => {
       recommendedTests: Array.isArray(parsed.recommendedTests) ? parsed.recommendedTests : [],
     };
   } catch (err) {
-    console.error('OpenAI API Error during Bug Analysis:', err.message);
+    console.error('Gemini API Error during Bug Analysis:', err.message);
     throw new AppError(`AI Bug Analysis failed: ${err.message}`, 500);
   }
 };

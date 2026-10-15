@@ -38,6 +38,8 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/codemate
       - REDIS_URL=redis://redis:6379
       - CLIENT_URL=http://localhost
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     depends_on:
       - mongodb
       - redis
