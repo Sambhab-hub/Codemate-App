@@ -63,6 +63,17 @@ CodeMate is a full-stack, AI-powered developer tool that connects to GitHub acco
 
 ---
 
+## 🌐 Live Deployment & Links
+
+| Service | Environment | Live URL | Status |
+| :--- | :--- | :--- | :--- |
+| **Frontend Web App** | Vercel (Production) | [https://codemate-app-three.vercel.app](https://codemate-app-three.vercel.app) | ![Vercel](https://img.shields.io/badge/Vercel-Deployed-success?style=flat&logo=vercel) |
+| **Backend API** | Render Cloud (Production) | [https://codemate-app.onrender.com](https://codemate-app.onrender.com) | ![Render](https://img.shields.io/badge/Render-Online-success?style=flat&logo=render) |
+| **API Health Check** | REST Health Probe | [https://codemate-app.onrender.com/api/health](https://codemate-app.onrender.com/api/health) | ![Status](https://img.shields.io/badge/Health-200%20OK-brightgreen) |
+
+> ⚡ **Quick Demo Access:**  
+> You can test the platform instantly by clicking **"⚡ Demo Mode — explore the UI"** on the [login page](https://codemate-app-three.vercel.app/login), or connect your GitHub account via OAuth SSO!
+
 ## ⚡ Quick Start Guide (Local Development)
 
 ### 1. Prerequisites
