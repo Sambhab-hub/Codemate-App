@@ -3,11 +3,6 @@
 const issueService = require('../services/issue.service');
 const asyncHandler = require('../utils/asyncHandler');
 
-/**
- * Issue Controllers — HTTP handlers for GitHub issues.
- */
-
-// POST /api/issues/sync/:repositoryId — Sync issues from GitHub for a repo
 const syncRepoIssues = asyncHandler(async (req, res) => {
   const { repositoryId } = req.params;
   const { state } = req.query;
@@ -18,7 +13,6 @@ const syncRepoIssues = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/issues — Get stored issues with optional filters
 const getIssues = asyncHandler(async (req, res) => {
   const { repositoryId, state } = req.query;
   const issues = await issueService.getIssues(req.user.userId, { repositoryId, state });
@@ -28,7 +22,6 @@ const getIssues = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/issues/:id — Get details of a single issue
 const getIssueById = asyncHandler(async (req, res) => {
   const issue = await issueService.getIssueById(req.user.userId, req.params.id);
   res.json({
@@ -37,7 +30,6 @@ const getIssueById = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/issues/:id/analyze — Analyze a GitHub issue with AI
 const analyzeIssue = asyncHandler(async (req, res) => {
   const analysis = await issueService.analyzeIssueWithAI(req.user.userId, req.params.id);
   res.status(201).json({

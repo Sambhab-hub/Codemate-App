@@ -4,9 +4,6 @@ const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 
-/**
- * Socket.IO Server Manager — real-time bidirectional communication.
- */
 let io = null;
 
 const initSocket = (httpServer) => {
@@ -17,7 +14,6 @@ const initSocket = (httpServer) => {
     },
   });
 
-  // Socket Authentication Middleware
   io.use((socket, next) => {
     const token = socket.handshake.auth?.token || socket.handshake.headers?.authorization?.split(' ')[1];
 
@@ -49,9 +45,6 @@ const initSocket = (httpServer) => {
   return io;
 };
 
-/**
- * Emit a real-time event to a specific user's private room.
- */
 const emitToUser = (userId, event, payload) => {
   if (io) {
     const roomName = `user:${userId}`;

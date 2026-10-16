@@ -6,10 +6,6 @@ const AIReview = require('../models/AIReview.model');
 const pullRequestService = require('../services/pullRequest.service');
 const aiService = require('../services/ai.service');
 
-/**
- * BullMQ Worker — processes background AI Code Review jobs.
- */
-
 const processReviewJob = async (job) => {
   const { reviewId, userId, pullRequestId } = job.data;
   console.log(`⚙️  [Worker] Processing review job #${job.id} for Review ID: ${reviewId}`);
@@ -44,8 +40,7 @@ const processReviewJob = async (job) => {
     review.testingRecommendations = aiResults.testingRecommendations;
 
     await review.save();
-    
-    // Emit real-time event to user's browser via Socket.IO
+
     const { emitToUser } = require('../sockets/socket');
     emitToUser(userId, 'review:completed', {
       reviewId,
@@ -72,7 +67,7 @@ if (redisClient) {
   try {
     reviewWorker = new Worker('ai-review-queue', processReviewJob, {
       connection: redisClient,
-      concurrency: 5, // Process up to 5 review jobs concurrently
+      concurrency: 5, 
     });
 
     reviewWorker.on('completed', (job) => {

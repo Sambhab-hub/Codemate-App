@@ -3,20 +3,17 @@
 const Redis = require('ioredis');
 const config = require('./env');
 
-/**
- * Redis connection configuration for BullMQ and Caching.
- */
 let redisClient = null;
 let isRedisConnected = false;
 
 try {
   redisClient = new Redis(config.redis.url, {
-    maxRetriesPerRequest: null, // Required by BullMQ
+    maxRetriesPerRequest: null, 
     enableReadyCheck: false,
-    lazyConnect: true, // Don't block application startup if Redis is offline
+    lazyConnect: true, 
     retryStrategy(times) {
       if (times > 2) {
-        return null; // Stop retrying after 2 attempts
+        return null; 
       }
       return 500;
     },
@@ -27,12 +24,10 @@ try {
     console.log('✅ Redis connected successfully');
   });
 
-  // Attach silent error handler to prevent unhandled ECONNREFUSED log spam in local dev
   redisClient.on('error', () => {
     isRedisConnected = false;
   });
 
-  // Attempt lazy background connection without crashing
   redisClient.connect().catch(() => {
     console.warn('⚠️  Redis connection unavailable — queue falling back to direct mode');
   });

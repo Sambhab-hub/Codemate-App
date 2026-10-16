@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react';
 import { BugIcon, CheckCircleIcon, SparklesIcon, ClockIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * AI Bug Assistant Page — plain-text bug root-cause analysis and fix generator.
- */
 const BugAssistant = () => {
   const [description, setDescription] = useState('');
   const [activeAnalysis, setActiveAnalysis] = useState(null);
@@ -13,7 +10,6 @@ const BugAssistant = () => {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Fetch past bug analyses
   const fetchHistory = async () => {
     try {
       setHistoryLoading(true);
@@ -30,7 +26,6 @@ const BugAssistant = () => {
     fetchHistory();
   }, []);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!description.trim()) {
@@ -69,7 +64,6 @@ const BugAssistant = () => {
         </p>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -78,9 +72,9 @@ const BugAssistant = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Form & Output */}
+
         <div className="lg:col-span-2 space-y-6">
-          {/* Form Card */}
+
           <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -115,7 +109,6 @@ const BugAssistant = () => {
             </form>
           </div>
 
-          {/* Active AI Output Card */}
           {activeAnalysis && (
             <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 space-y-5">
               <div className="flex items-center justify-between border-b border-[#30363d] pb-4">
@@ -128,7 +121,6 @@ const BugAssistant = () => {
                 </span>
               </div>
 
-              {/* Probable Cause */}
               <div>
                 <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Probable Cause</h4>
                 <p className="text-sm font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 p-3 rounded-lg">
@@ -136,7 +128,6 @@ const BugAssistant = () => {
                 </p>
               </div>
 
-              {/* Explanation */}
               <div>
                 <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Explanation</h4>
                 <p className="text-xs text-gray-300 leading-relaxed bg-[#0d1117] p-3 rounded-lg border border-[#30363d]">
@@ -144,7 +135,6 @@ const BugAssistant = () => {
                 </p>
               </div>
 
-              {/* Recommended Fix */}
               <div>
                 <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Recommended Fix</h4>
                 <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 font-mono text-xs text-green-400 overflow-x-auto">
@@ -152,7 +142,6 @@ const BugAssistant = () => {
                 </div>
               </div>
 
-              {/* Recommended Tests */}
               {activeAnalysis.recommendedTests?.length > 0 && (
                 <div>
                   <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Recommended Tests</h4>
@@ -170,7 +159,6 @@ const BugAssistant = () => {
           )}
         </div>
 
-        {/* Right Column: Analysis History Sidebar */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold text-gray-200 flex items-center gap-2">
             <ClockIcon className="w-4 h-4 text-gray-400" />

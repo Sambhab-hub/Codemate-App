@@ -6,13 +6,6 @@ const Repository = require('../models/Repository.model');
 const GitHubConnection = require('../models/GitHubConnection.model');
 const AppError = require('../utils/AppError');
 
-/**
- * Pull Request Service — handles fetching PRs and diffs from GitHub & database.
- */
-
-/**
- * Helper to get the user's GitHub access token from database.
- */
 const getGitHubToken = async (userId) => {
   const connection = await GitHubConnection.findOne({ userId }).select('+accessToken');
   if (!connection || !connection.accessToken) {
@@ -21,9 +14,6 @@ const getGitHubToken = async (userId) => {
   return connection.accessToken;
 };
 
-/**
- * Sync & fetch Pull Requests for a tracked repository from GitHub.
- */
 const syncRepoPullRequests = async (userId, repositoryId, state = 'open') => {
   const repo = await Repository.findOne({ _id: repositoryId, userId });
   if (!repo) {
@@ -42,7 +32,7 @@ const syncRepoPullRequests = async (userId, repositoryId, state = 'open') => {
           'User-Agent': 'CodeMate-App',
         },
         params: {
-          state, // 'open', 'closed', 'all'
+          state, 
           per_page: 50,
           sort: 'updated',
           direction: 'desc',
@@ -80,11 +70,8 @@ const syncRepoPullRequests = async (userId, repositoryId, state = 'open') => {
   }
 };
 
-/**
- * Get stored Pull Requests from database with optional filters.
- */
 const getPullRequests = async (userId, { repositoryId, state }) => {
-  // Find all repos owned by this user
+
   const userRepos = await Repository.find({ userId }).select('_id');
   const repoIds = userRepos.map((r) => r._id);
 
@@ -103,16 +90,12 @@ const getPullRequests = async (userId, { repositoryId, state }) => {
     .sort({ updatedAt: -1 });
 };
 
-/**
- * Get details of a single Pull Request by ID.
- */
 const getPullRequestById = async (userId, pullRequestId) => {
   const pr = await PullRequest.findById(pullRequestId).populate('repositoryId');
   if (!pr) {
     throw new AppError('Pull request not found.', 404);
   }
 
-  // Verify repo belongs to user
   if (pr.repositoryId.userId.toString() !== userId) {
     throw new AppError('Access denied.', 403);
   }
@@ -120,9 +103,6 @@ const getPullRequestById = async (userId, pullRequestId) => {
   return pr;
 };
 
-/**
- * Fetch changed files and diff patches for a specific Pull Request from GitHub API.
- */
 const getPullRequestFiles = async (userId, pullRequestId) => {
   const pr = await getPullRequestById(userId, pullRequestId);
   const repo = pr.repositoryId;
@@ -145,11 +125,11 @@ const getPullRequestFiles = async (userId, pullRequestId) => {
 
     return response.data.map((file) => ({
       filename: file.filename,
-      status: file.status, // 'added', 'modified', 'removed', 'renamed'
+      status: file.status, 
       additions: file.additions,
       deletions: file.deletions,
       changes: file.changes,
-      patch: file.patch || '', // Git unified diff patch snippet
+      patch: file.patch || '', 
       rawUrl: file.raw_url,
     }));
   } catch (err) {

@@ -3,10 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { GitHubIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * GitHub Integration Page.
- * Handles OAuth connection, status display, and disconnection.
- */
 const GitHub = () => {
   const [searchParams] = useSearchParams();
   const [connection, setConnection] = useState(null);
@@ -15,7 +11,6 @@ const GitHub = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Fetch current connection status from server
   const fetchStatus = async () => {
     try {
       setLoading(true);
@@ -31,7 +26,6 @@ const GitHub = () => {
   useEffect(() => {
     fetchStatus();
 
-    // Check URL query parameters for callback status/error
     const statusParam = searchParams.get('status');
     const errorParam = searchParams.get('error');
 
@@ -42,13 +36,12 @@ const GitHub = () => {
     }
   }, [searchParams]);
 
-  // Initiate OAuth flow
   const handleConnect = async () => {
     try {
       setActionLoading(true);
       setError('');
       const { data } = await api.get('/github/auth');
-      // Redirect user's browser to GitHub OAuth authorization URL
+
       window.location.href = data.data.url;
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to initialize GitHub OAuth flow.');
@@ -56,7 +49,6 @@ const GitHub = () => {
     }
   };
 
-  // Disconnect GitHub account
   const handleDisconnect = async () => {
     try {
       setActionLoading(true);
@@ -89,7 +81,6 @@ const GitHub = () => {
         </p>
       </div>
 
-      {/* Success Alert */}
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex justify-between items-center">
           <span>{successMsg}</span>
@@ -97,7 +88,6 @@ const GitHub = () => {
         </div>
       )}
 
-      {/* Error Alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -105,7 +95,6 @@ const GitHub = () => {
         </div>
       )}
 
-      {/* Connection Card */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6">
         <div className="flex items-center gap-4 mb-6">
           {connection?.connected && connection.githubAvatarUrl ? (
@@ -144,7 +133,6 @@ const GitHub = () => {
           </div>
         </div>
 
-        {/* Access permissions summary */}
         <div className="space-y-3 mb-6 text-sm text-gray-400">
           <p className="font-medium text-gray-300">What CodeMate can access:</p>
           {[
@@ -160,7 +148,6 @@ const GitHub = () => {
           ))}
         </div>
 
-        {/* Action Button */}
         {connection?.connected ? (
           <button
             onClick={handleDisconnect}

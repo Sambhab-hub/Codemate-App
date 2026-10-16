@@ -33,7 +33,7 @@ const Register = () => {
       const response = err.response?.data;
 
       if (response?.errors) {
-        // Field-level validation errors from express-validator
+
         const fieldErrors = {};
         response.errors.forEach(({ field, message }) => {
           fieldErrors[field] = message;
@@ -59,7 +59,7 @@ const Register = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
+
         <div>
           <label className="block text-sm text-gray-400 mb-1.5" htmlFor="name">
             Full name
@@ -77,7 +77,6 @@ const Register = () => {
           {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
         </div>
 
-        {/* Email */}
         <div>
           <label className="block text-sm text-gray-400 mb-1.5" htmlFor="email">
             Email address
@@ -95,7 +94,6 @@ const Register = () => {
           {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
         </div>
 
-        {/* Password */}
         <div>
           <label className="block text-sm text-gray-400 mb-1.5" htmlFor="password">
             Password

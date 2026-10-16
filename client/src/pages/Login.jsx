@@ -20,21 +20,20 @@ const Login = () => {
 
     try {
       const { data } = await api.post('/auth/login', { email, password });
-      // Store user + access token in Redux memory
+
       dispatch(setCredentials({
         user: data.data.user,
         accessToken: data.data.accessToken,
       }));
       navigate('/dashboard');
     } catch (err) {
-      // Show the server's error message, or a generic fallback
+
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Demo mode — explore the UI without a real account
   const enterDemoMode = () => {
     dispatch(setCredentials({
       user: { name: 'Demo User', email: 'demo@codemate.dev' },
@@ -101,7 +100,6 @@ const Login = () => {
         <div className="flex-1 h-px bg-[#30363d]" />
       </div>
 
-      {/* GitHub OAuth — wired in Phase 5 */}
       <button
         onClick={() => window.location.href = '/api/github/auth'}
         className="w-full flex items-center justify-center gap-3 bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-gray-200 font-medium py-2.5 rounded-lg text-sm transition-colors mb-3"

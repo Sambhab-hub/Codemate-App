@@ -2,17 +2,6 @@
 
 const { body } = require('express-validator');
 
-/**
- * Validation rules for auth endpoints.
- *
- * These arrays of rules are passed directly to the route definition:
- *   router.post('/register', registerRules, validate, authController.register);
- *
- * express-validator runs each rule, collects errors internally,
- * then our validate middleware checks for those errors.
- * If any rule fails, the controller never runs.
- */
-
 const registerRules = [
   body('name')
     .trim()
@@ -23,7 +12,7 @@ const registerRules = [
     .trim()
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please enter a valid email address')
-    .normalizeEmail(), // converts "John@GMAIL.com" → "john@gmail.com"
+    .normalizeEmail(), 
 
   body('password')
     .notEmpty().withMessage('Password is required')

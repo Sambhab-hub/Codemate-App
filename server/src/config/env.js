@@ -2,15 +2,6 @@
 
 require('dotenv').config();
 
-/**
- * Central configuration object.
- *
- * All other files import from here — they never read process.env directly.
- * This means:
- *  1. One place to see all config variables
- *  2. Easy to add validation later (Phase 3 adds required checks)
- *  3. Changing a variable name only requires changing it here
- */
 const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 5000,

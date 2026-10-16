@@ -3,22 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { IssueIcon, FolderIcon, SparklesIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * Issues Page — view, filter, sync, and analyze GitHub issues.
- */
 const Issues = () => {
   const navigate = useNavigate();
   const [issues, setIssues] = useState([]);
   const [repositories, setRepositories] = useState([]);
   const [selectedRepoId, setSelectedRepoId] = useState('');
-  const [selectedState, setSelectedState] = useState('open'); // 'open' | 'closed' | 'all'
+  const [selectedState, setSelectedState] = useState('open'); 
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [analyzingId, setAnalyzingId] = useState(null);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Load repositories for selector
   const fetchRepositories = async () => {
     try {
       const { data } = await api.get('/repositories');
@@ -28,7 +24,6 @@ const Issues = () => {
     }
   };
 
-  // Load stored issues
   const fetchIssues = async () => {
     try {
       setLoading(true);
@@ -54,7 +49,6 @@ const Issues = () => {
     fetchIssues();
   }, [selectedRepoId, selectedState]);
 
-  // Sync issues from GitHub for selected repository
   const handleSyncIssues = async () => {
     if (!selectedRepoId) {
       setError('Please select a repository to sync issues from GitHub.');
@@ -74,13 +68,12 @@ const Issues = () => {
     }
   };
 
-  // Analyze issue with AI Bug Assistant
   const handleAnalyzeIssue = async (issueId) => {
     try {
       setAnalyzingId(issueId);
       setError('');
       await api.post(`/issues/${issueId}/analyze`);
-      // Redirect to Bug Assistant page where the analysis is displayed
+
       navigate('/bug-assistant');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to analyze issue.');
@@ -111,9 +104,8 @@ const Issues = () => {
         </button>
       </div>
 
-      {/* Filter Toolbar */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {/* Repo Selector */}
+
         <div className="flex items-center gap-2">
           <FolderIcon className="w-4 h-4 text-gray-400" />
           <select
@@ -130,7 +122,6 @@ const Issues = () => {
           </select>
         </div>
 
-        {/* State Filter Tabs */}
         <div className="flex bg-[#0d1117] border border-[#30363d] p-1 rounded-lg">
           {['open', 'closed', 'all'].map((tab) => (
             <button
@@ -148,7 +139,6 @@ const Issues = () => {
         </div>
       </div>
 
-      {/* Success alert */}
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex justify-between items-center">
           <span>{successMsg}</span>
@@ -156,7 +146,6 @@ const Issues = () => {
         </div>
       )}
 
-      {/* Error alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -164,7 +153,6 @@ const Issues = () => {
         </div>
       )}
 
-      {/* Issues List */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />

@@ -8,10 +8,6 @@ const aiService = require('./ai.service');
 const BugAnalysis = require('../models/BugAnalysis.model');
 const AppError = require('../utils/AppError');
 
-/**
- * Issue Service — handles fetching, syncing, and analyzing GitHub issues.
- */
-
 const getGitHubToken = async (userId) => {
   const connection = await GitHubConnection.findOne({ userId }).select('+accessToken');
   if (!connection || !connection.accessToken) {
@@ -20,9 +16,6 @@ const getGitHubToken = async (userId) => {
   return connection.accessToken;
 };
 
-/**
- * Sync issues from GitHub for a tracked repository.
- */
 const syncRepoIssues = async (userId, repositoryId, state = 'open') => {
   const repo = await Repository.findOne({ _id: repositoryId, userId });
   if (!repo) {
@@ -41,7 +34,7 @@ const syncRepoIssues = async (userId, repositoryId, state = 'open') => {
           'User-Agent': 'CodeMate-App',
         },
         params: {
-          state, // 'open', 'closed', 'all'
+          state, 
           per_page: 50,
           sort: 'updated',
           direction: 'desc',
@@ -49,8 +42,6 @@ const syncRepoIssues = async (userId, repositoryId, state = 'open') => {
       },
     );
 
-    // GitHub's issues endpoint returns both issues and pull requests (PRs have a `pull_request` key).
-    // Filter out PRs so we only store genuine issues.
     const rawIssues = response.data.filter((item) => !item.pull_request);
     const syncedIssues = [];
 
@@ -82,9 +73,6 @@ const syncRepoIssues = async (userId, repositoryId, state = 'open') => {
   }
 };
 
-/**
- * Get stored issues with optional repository and state filters.
- */
 const getIssues = async (userId, { repositoryId, state }) => {
   const userRepos = await Repository.find({ userId }).select('_id');
   const repoIds = userRepos.map((r) => r._id);
@@ -104,9 +92,6 @@ const getIssues = async (userId, { repositoryId, state }) => {
     .sort({ updatedAt: -1 });
 };
 
-/**
- * Get single issue details.
- */
 const getIssueById = async (userId, issueId) => {
   const issue = await Issue.findById(issueId).populate('repositoryId');
   if (!issue) {
@@ -120,9 +105,6 @@ const getIssueById = async (userId, issueId) => {
   return issue;
 };
 
-/**
- * Analyze a GitHub issue using AI Bug Assistant.
- */
 const analyzeIssueWithAI = async (userId, issueId) => {
   const issue = await getIssueById(userId, issueId);
 

@@ -5,13 +5,6 @@ const Repository = require('../models/Repository.model');
 const GitHubConnection = require('../models/GitHubConnection.model');
 const AppError = require('../utils/AppError');
 
-/**
- * Repository Service — handles fetching GitHub repos and managing tracked repos.
- */
-
-/**
- * Helper to get the user's GitHub access token from database.
- */
 const getGitHubToken = async (userId) => {
   const connection = await GitHubConnection.findOne({ userId }).select('+accessToken');
   if (!connection || !connection.accessToken) {
@@ -20,9 +13,6 @@ const getGitHubToken = async (userId) => {
   return connection.accessToken;
 };
 
-/**
- * Fetch remote GitHub repositories for the authenticated user.
- */
 const fetchRemoteGitHubRepos = async (userId) => {
   const token = await getGitHubToken(userId);
 
@@ -40,7 +30,6 @@ const fetchRemoteGitHubRepos = async (userId) => {
       },
     });
 
-    // Map GitHub API response to lightweight object
     return response.data.map((repo) => ({
       githubRepositoryId: repo.id,
       name: repo.name,
@@ -60,16 +49,10 @@ const fetchRemoteGitHubRepos = async (userId) => {
   }
 };
 
-/**
- * Get all tracked repositories for a user in CodeMate.
- */
 const getTrackedRepos = async (userId) => {
   return Repository.find({ userId }).sort({ updatedAt: -1 });
 };
 
-/**
- * Add / Track a repository in CodeMate.
- */
 const trackRepo = async (userId, repoData) => {
   const {
     githubRepositoryId,
@@ -87,7 +70,6 @@ const trackRepo = async (userId, repoData) => {
     throw new AppError('Missing required repository metadata (githubRepositoryId, name, owner, fullName)', 400);
   }
 
-  // Check if repository is already tracked by this user
   const existing = await Repository.findOne({ userId, githubRepositoryId });
   if (existing) {
     throw new AppError('Repository is already tracked in CodeMate', 409);
@@ -109,9 +91,6 @@ const trackRepo = async (userId, repoData) => {
   return repo;
 };
 
-/**
- * Get details of a single tracked repository.
- */
 const getTrackedRepoById = async (userId, repoId) => {
   const repo = await Repository.findOne({ _id: repoId, userId });
   if (!repo) {
@@ -120,9 +99,6 @@ const getTrackedRepoById = async (userId, repoId) => {
   return repo;
 };
 
-/**
- * Untrack / Remove a repository from CodeMate.
- */
 const untrackRepo = async (userId, repoId) => {
   const repo = await Repository.findOneAndDelete({ _id: repoId, userId });
   if (!repo) {

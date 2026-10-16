@@ -4,11 +4,6 @@ const User = require('../models/User.model');
 const authService = require('../services/auth.service');
 const asyncHandler = require('../utils/asyncHandler');
 
-/**
- * Auth Controllers — HTTP layer.
- */
-
-// POST /api/auth/register
 const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -28,7 +23,6 @@ const register = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/auth/login
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -48,7 +42,6 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/auth/refresh
 const refresh = asyncHandler(async (req, res) => {
   const { refreshToken } = req.cookies;
 
@@ -68,7 +61,6 @@ const refresh = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/auth/logout
 const logout = asyncHandler(async (req, res) => {
   authService.clearRefreshTokenCookie(res);
 
@@ -78,7 +70,6 @@ const logout = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/auth/me
 const getMe = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.userId);
 
@@ -92,7 +83,6 @@ const getMe = asyncHandler(async (req, res) => {
   });
 });
 
-// PUT /api/auth/profile — Update name & email
 const updateProfile = asyncHandler(async (req, res) => {
   const { name, email } = req.body;
   const user = await authService.updateProfile(req.user.userId, { name, email });
@@ -104,7 +94,6 @@ const updateProfile = asyncHandler(async (req, res) => {
   });
 });
 
-// PUT /api/auth/password — Change password
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   await authService.changePassword(req.user.userId, { currentPassword, newPassword });
@@ -115,7 +104,6 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 });
 
-// DELETE /api/auth/account — Delete account & cascading data
 const deleteAccount = asyncHandler(async (req, res) => {
   await authService.deleteAccount(req.user.userId);
   authService.clearRefreshTokenCookie(res);

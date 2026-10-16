@@ -61,12 +61,11 @@ const TopNav = () => {
 
   return (
     <header className="h-14 bg-[#161b22] border-b border-[#30363d] flex items-center justify-between px-6 flex-shrink-0 relative">
-      {/* Page title */}
+
       <h1 className="text-sm font-semibold text-gray-200">{title}</h1>
 
-      {/* Right actions */}
       <div className="flex items-center gap-3">
-        {/* Notification Bell */}
+
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -78,7 +77,6 @@ const TopNav = () => {
             )}
           </button>
 
-          {/* Notifications Dropdown Panel */}
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-[#30363d] flex items-center justify-between">
@@ -122,7 +120,6 @@ const TopNav = () => {
           )}
         </div>
 
-        {/* User avatar */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
             {user?.githubAvatarUrl ? (

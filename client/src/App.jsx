@@ -24,20 +24,6 @@ import BugAssistant from './pages/BugAssistant';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 
-/**
- * AppRoutes — separated so it can use useDispatch inside the Provider.
- *
- * SILENT REFRESH ON STARTUP:
- * When the user refreshes the page, Redux state is wiped (it's in memory).
- * But the HttpOnly refresh token cookie persists in the browser.
- *
- * On mount, we call POST /api/auth/refresh:
- *   - If the cookie is valid → we get a new access token → restore Redux state
- *   - If the cookie is expired/missing → user stays logged out
- *
- * During this check (initializing = true), we show a spinner.
- * Without this, users would be kicked to the login page on every page refresh.
- */
 const AppRoutes = () => {
   const dispatch = useDispatch();
   const [initializing, setInitializing] = useState(true);
@@ -51,14 +37,13 @@ const AppRoutes = () => {
         }));
       })
       .catch(() => {
-        // No valid session — that's fine, user will see login page
+
       })
       .finally(() => {
         setInitializing(false);
       });
   }, [dispatch]);
 
-  // Show a loading screen while checking for an existing session
   if (initializing) {
     return (
       <div className="min-h-screen bg-[#0d1117] flex items-center justify-center">
@@ -74,13 +59,12 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public — auth pages */}
+
         <Route element={<AuthLayout />}>
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Route>
 
-        {/* Protected — requires authentication */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard"          element={<Dashboard />} />

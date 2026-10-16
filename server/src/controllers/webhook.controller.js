@@ -8,16 +8,10 @@ const aiService = require('../services/ai.service');
 const pullRequestService = require('../services/pullRequest.service');
 const asyncHandler = require('../utils/asyncHandler');
 
-/**
- * Webhook Controller — processes incoming GitHub webhook events.
- */
-
-// POST /api/webhooks/github
 const handleGitHubWebhook = asyncHandler(async (req, res) => {
   const event = req.headers['x-github-event'];
   const payload = req.body;
 
-  // Handle GitHub Ping event (sent when webhook is first configured)
   if (event === 'ping') {
     return res.json({
       success: true,
@@ -26,15 +20,13 @@ const handleGitHubWebhook = asyncHandler(async (req, res) => {
     });
   }
 
-  // Handle Pull Request events
   if (event === 'pull_request') {
     const { action, pull_request: prData, repository: repoData } = payload;
 
     console.log(`📡 [Webhook] Received PR event '${action}' for ${repoData.full_name} #${prData.number}`);
 
-    // We automatically trigger AI review on 'opened', 'synchronize' (new commit), and 'reopened'
     if (['opened', 'synchronize', 'reopened'].includes(action)) {
-      // 1. Find if this repo is tracked in CodeMate
+
       const repo = await Repository.findOne({ githubRepositoryId: repoData.id });
       if (!repo) {
         return res.json({
@@ -43,7 +35,6 @@ const handleGitHubWebhook = asyncHandler(async (req, res) => {
         });
       }
 
-      // 2. Upsert Pull Request record in MongoDB
       const pr = await PullRequest.findOneAndUpdate(
         { repositoryId: repo._id, githubPullRequestId: prData.id },
         {
@@ -60,7 +51,6 @@ const handleGitHubWebhook = asyncHandler(async (req, res) => {
         { upsert: true, new: true, runValidators: true },
       );
 
-      // 3. Create initial AI review record
       const review = await AIReview.create({
         userId: repo.userId,
         repositoryId: repo._id,
@@ -69,7 +59,6 @@ const handleGitHubWebhook = asyncHandler(async (req, res) => {
         status: 'pending',
       });
 
-      // 4. Dispatch job to BullMQ queue (or fallback)
       const jobId = await addReviewJob({
         reviewId: review._id.toString(),
         userId: repo.userId.toString(),
@@ -87,7 +76,6 @@ const handleGitHubWebhook = asyncHandler(async (req, res) => {
         });
       }
 
-      // Direct execution fallback if Redis is offline
       review.status = 'processing';
       await review.save();
 

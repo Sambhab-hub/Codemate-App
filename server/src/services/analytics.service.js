@@ -6,12 +6,8 @@ const PullRequest = require('../models/PullRequest.model');
 const AIReview = require('../models/AIReview.model');
 const Issue = require('../models/Issue.model');
 
-/**
- * Analytics Service — handles platform metric aggregation and dashboard statistics.
- */
-
 const getDashboardStats = async (userId) => {
-  // Demo Mode mock dashboard stats
+
   if (!userId || userId === '000000000000000000000000' || userId === 'demo') {
     return {
       repoCount: 3,
@@ -55,7 +51,6 @@ const getDashboardStats = async (userId) => {
   try {
     const repoIds = await getRepoIds(userId);
 
-    // 1. Basic counts
     const [repoCount, openPRCount, reviewCount, openIssueCount] = await Promise.all([
       Repository.countDocuments({ userId }),
       PullRequest.countDocuments({ repositoryId: { $in: repoIds }, state: 'open' }),
@@ -63,7 +58,6 @@ const getDashboardStats = async (userId) => {
       Issue.countDocuments({ repositoryId: { $in: repoIds }, state: 'open' }),
     ]);
 
-    // 2. Average score aggregation
     let avgScore = 8.5;
     if (userObjectId) {
       const avgScoreResult = await AIReview.aggregate([
@@ -75,7 +69,6 @@ const getDashboardStats = async (userId) => {
       }
     }
 
-    // 3. Category breakdown aggregation from findings
     let categoryBreakdown = [];
     if (userObjectId) {
       categoryBreakdown = await AIReview.aggregate([
@@ -99,7 +92,6 @@ const getDashboardStats = async (userId) => {
       { category: 'error-handling', count: getCategoryCount(categoryBreakdown, 'error-handling') },
     ];
 
-    // 4. Recent reviews
     const recentReviews = await AIReview.find({ userId, status: 'completed' })
       .populate('repositoryId', 'fullName')
       .sort({ createdAt: -1 })

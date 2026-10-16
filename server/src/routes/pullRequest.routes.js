@@ -6,11 +6,6 @@ const pullRequestController = require('../controllers/pullRequest.controller');
 
 const router = express.Router();
 
-/**
- * Pull Request Routes
- * All routes require authentication
- */
-
 router.use(authenticate);
 
 router.post('/sync/:repositoryId', pullRequestController.syncRepoPRs);

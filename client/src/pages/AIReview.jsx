@@ -3,9 +3,6 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { SparklesIcon, CheckCircleIcon, FolderIcon, PullRequestIcon, ZapIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * AI Code Review Page — trigger and inspect comprehensive AI PR code reviews.
- */
 const AIReview = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedReviewId = searchParams.get('id');
@@ -16,19 +13,16 @@ const AIReview = () => {
   const [repositories, setRepositories] = useState([]);
   const [pullRequests, setPullRequests] = useState([]);
 
-  // Form modal state
   const [showTriggerModal, setShowTriggerModal] = useState(Boolean(targetPRId));
   const [selectedRepoId, setSelectedRepoId] = useState('');
   const [selectedPRId, setSelectedPRId] = useState(targetPRId || '');
 
-  // Loading & error state
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
-  // Load user's past reviews
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -41,7 +35,6 @@ const AIReview = () => {
     }
   };
 
-  // Load tracked repositories for review modal
   const fetchRepositories = async () => {
     try {
       const { data } = await api.get('/repositories');
@@ -56,7 +49,6 @@ const AIReview = () => {
     fetchRepositories();
   }, []);
 
-  // Fetch PRs when repo is selected in trigger modal
   useEffect(() => {
     if (!selectedRepoId) {
       setPullRequests([]);
@@ -67,7 +59,6 @@ const AIReview = () => {
       .catch((err) => console.error('Failed to load PRs:', err.message));
   }, [selectedRepoId]);
 
-  // Fetch single review detail if URL has `id`
   useEffect(() => {
     if (!selectedReviewId) {
       setSelectedReview(null);
@@ -87,7 +78,6 @@ const AIReview = () => {
     fetchReviewDetail();
   }, [selectedReviewId]);
 
-  // Trigger a new AI Review
   const handleTriggerReview = async (e) => {
     e.preventDefault();
     if (!selectedPRId) {
@@ -101,7 +91,7 @@ const AIReview = () => {
       const { data } = await api.post('/ai/review', { pullRequestId: selectedPRId });
       setShowTriggerModal(false);
       await fetchReviews();
-      // Set active review view to newly created review
+
       setSearchParams({ id: data.data._id });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to generate AI code review.');
@@ -129,7 +119,6 @@ const AIReview = () => {
     }
   };
 
-  // ── DETAIL VIEW ─────────────────────────────────────────────────────────────
   if (selectedReviewId && selectedReview) {
     const filteredFindings = categoryFilter === 'all'
       ? selectedReview.findings
@@ -137,7 +126,7 @@ const AIReview = () => {
 
     return (
       <div className="max-w-5xl space-y-6">
-        {/* Back Link & Header */}
+
         <div className="flex items-center justify-between border-b border-[#30363d] pb-4">
           <button
             onClick={() => setSearchParams({})}
@@ -150,10 +139,9 @@ const AIReview = () => {
           </span>
         </div>
 
-        {/* Score & Summary Banner */}
         <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            {/* Score Ring */}
+
             <div className="w-20 h-20 rounded-full bg-[#0d1117] border-4 border-blue-500/30 flex flex-col items-center justify-center flex-shrink-0">
               <span className="text-2xl font-extrabold text-white">
                 {selectedReview.overallScore ? selectedReview.overallScore.toFixed(1) : '8.0'}
@@ -177,14 +165,12 @@ const AIReview = () => {
           </div>
         </div>
 
-        {/* Findings Filter & List */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 className="text-base font-semibold text-white">
               Identified Findings ({filteredFindings.length})
             </h3>
 
-            {/* Category Pills */}
             <div className="flex flex-wrap gap-1.5 bg-[#161b22] border border-[#30363d] p-1 rounded-lg">
               {['all', 'security', 'performance', 'bug', 'quality', 'error-handling'].map((cat) => (
                 <button
@@ -242,7 +228,6 @@ const AIReview = () => {
           )}
         </div>
 
-        {/* Testing Recommendations */}
         {selectedReview.testingRecommendations?.length > 0 && (
           <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 space-y-3">
             <h3 className="text-sm font-semibold text-gray-200">Recommended Test Cases</h3>
@@ -260,7 +245,6 @@ const AIReview = () => {
     );
   }
 
-  // ── REVIEWS LIST VIEW ───────────────────────────────────────────────────────
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -280,7 +264,6 @@ const AIReview = () => {
         </button>
       </div>
 
-      {/* Trigger Review Modal */}
       {showTriggerModal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 max-w-md w-full space-y-4">
@@ -348,7 +331,6 @@ const AIReview = () => {
         </div>
       )}
 
-      {/* Error Alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -356,7 +338,6 @@ const AIReview = () => {
         </div>
       )}
 
-      {/* Past Reviews List */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />

@@ -9,17 +9,11 @@ const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-/**
- * Auth Routes
- */
-
-// Public routes
 router.post('/register', authLimiter, registerRules, validate, authController.register);
 router.post('/login',    authLimiter, loginRules,    validate, authController.login);
 router.post('/refresh',                                         authController.refresh);
 router.post('/logout',                                          authController.logout);
 
-// Protected routes
 router.get('/me',         authenticate, authController.getMe);
 router.put('/profile',    authenticate, authController.updateProfile);
 router.put('/password',   authenticate, authController.changePassword);

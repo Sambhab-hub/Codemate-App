@@ -11,10 +11,6 @@ const BugAnalysis = require('../models/BugAnalysis.model');
 const config = require('../config/env');
 const AppError = require('../utils/AppError');
 
-/**
- * Auth Service — all authentication & account management business logic.
- */
-
 const generateAccessToken = (user) => {
   return jwt.sign(
     { userId: user._id.toString(), email: user.email },
@@ -98,11 +94,6 @@ const refreshAccessToken = async (refreshToken) => {
   return user;
 };
 
-// ── ACCOUNT MANAGEMENT ─────────────────────────────────────────────────────────
-
-/**
- * Update user's profile name and email.
- */
 const updateProfile = async (userId, { name, email }) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -125,9 +116,6 @@ const updateProfile = async (userId, { name, email }) => {
   return user;
 };
 
-/**
- * Change password after verifying current password.
- */
 const changePassword = async (userId, { currentPassword, newPassword }) => {
   const user = await User.findById(userId).select('+passwordHash');
   if (!user || !user.passwordHash) {
@@ -143,14 +131,10 @@ const changePassword = async (userId, { currentPassword, newPassword }) => {
   await user.save();
 };
 
-/**
- * Delete user account and cascade delete all user resources.
- */
 const deleteAccount = async (userId) => {
   const repos = await Repository.find({ userId }).select('_id');
   const repoIds = repos.map((r) => r._id);
 
-  // Cascading deletes across collections
   await Promise.all([
     User.deleteOne({ _id: userId }),
     GitHubConnection.deleteOne({ userId }),

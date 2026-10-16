@@ -3,9 +3,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 
-/**
- * Authentication Middleware — protects routes that require a logged-in user.
- */
 const DEMO_USER = {
   userId: '000000000000000000000000',
   email: 'demo@codemate.dev',
@@ -24,7 +21,6 @@ const authenticate = (req, res, next) => {
 
   const token = authHeader.split(' ')[1];
 
-  // Support demo mode without throwing 401
   if (token === 'demo-token') {
     req.user = DEMO_USER;
     return next();
@@ -54,7 +50,7 @@ const optionalAuthenticate = (req, res, next) => {
       const decoded = jwt.verify(token, config.jwt.secret);
       req.user = decoded;
     } catch (err) {
-      // Ignore token verification errors in optional authentication
+
     }
   }
 

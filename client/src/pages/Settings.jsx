@@ -4,30 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import { setCredentials, logout } from '../store/slices/authSlice';
 import api from '../services/api';
 
-/**
- * Settings Page — manage profile information, password security, and account deletion.
- */
 const Settings = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const accessToken = useSelector((state) => state.auth.accessToken);
 
-  // Profile form state
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState('');
   const [profileError, setProfileError] = useState('');
 
-  // Password form state
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -39,7 +33,6 @@ const Settings = () => {
     }
   }, [user]);
 
-  // Handle Profile Update
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
@@ -56,7 +49,6 @@ const Settings = () => {
     }
   };
 
-  // Handle Password Change
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (!currentPassword || !newPassword) {
@@ -79,7 +71,6 @@ const Settings = () => {
     }
   };
 
-  // Handle Account Deletion
   const handleDeleteAccount = async () => {
     try {
       setDeleteLoading(true);
@@ -100,7 +91,6 @@ const Settings = () => {
         <p className="text-gray-500 text-sm mt-1">Manage your account credentials and security preferences.</p>
       </div>
 
-      {/* ── PROFILE SECTION ────────────────────────────────────────────── */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-200 border-b border-[#30363d] pb-3">Profile Information</h3>
 
@@ -152,7 +142,6 @@ const Settings = () => {
         </form>
       </div>
 
-      {/* ── SECURITY SECTION ───────────────────────────────────────────── */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-gray-200 border-b border-[#30363d] pb-3">Change Password</h3>
 
@@ -207,7 +196,6 @@ const Settings = () => {
         </form>
       </div>
 
-      {/* ── DANGER ZONE ────────────────────────────────────────────────── */}
       <div className="bg-[#161b22] border border-red-500/20 rounded-xl p-6 space-y-4">
         <h3 className="text-sm font-semibold text-red-400 border-b border-red-500/20 pb-3">Danger Zone</h3>
         <div className="flex items-center justify-between">
@@ -226,7 +214,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Account Deletion Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="bg-[#161b22] border border-red-500/30 rounded-xl p-6 max-w-md w-full space-y-4">

@@ -1,8 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-/**
- * Auth slice — manages user authentication state and access tokens.
- */
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -22,7 +19,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
     },
     updateToken: (state, action) => {
-      // Used for silent refresh — don't clear user, just update token
+
       state.accessToken = action.payload;
     },
   },

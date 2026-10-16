@@ -1,10 +1,3 @@
-/**
- * Inline SVG icons — no extra package needed.
- * All icons are from Heroicons (MIT license) with strokeWidth 1.5.
- *
- * Usage: import { HomeIcon, FolderIcon } from '../ui/Icons';
- *        <HomeIcon className="w-5 h-5 text-gray-400" />
- */
 
 export const HomeIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

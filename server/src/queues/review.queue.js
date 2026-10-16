@@ -3,10 +3,6 @@
 const { Queue } = require('bullmq');
 const { redisClient, getIsRedisConnected } = require('../config/redis');
 
-/**
- * BullMQ Review Queue — manages background job dispatch for AI Code Reviews.
- */
-
 let reviewQueue = null;
 
 if (redisClient) {
@@ -28,15 +24,12 @@ if (redisClient) {
   }
 }
 
-/**
- * Add an AI Review job to the queue.
- */
 const addReviewJob = async (data) => {
   if (reviewQueue && getIsRedisConnected()) {
     const job = await reviewQueue.add('analyze-pr-job', data);
     return job.id;
   }
-  return null; // Signals controller to execute directly if Redis is not active
+  return null; 
 };
 
 module.exports = {

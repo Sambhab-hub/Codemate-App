@@ -1,9 +1,6 @@
 import { io } from 'socket.io-client';
 import { store } from '../store/store';
 
-/**
- * Socket.IO Client Service — connects browser to server real-time event system.
- */
 let socket = null;
 
 export const connectSocket = () => {

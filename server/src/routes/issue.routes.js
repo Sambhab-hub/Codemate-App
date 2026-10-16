@@ -7,10 +7,6 @@ const issueController = require('../controllers/issue.controller');
 
 const router = express.Router();
 
-/**
- * Issue Routes — protected with authentication
- */
-
 router.use(authenticate);
 
 router.post('/sync/:repositoryId', issueController.syncRepoIssues);

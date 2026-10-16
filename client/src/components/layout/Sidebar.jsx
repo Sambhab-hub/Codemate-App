@@ -36,7 +36,6 @@ const Sidebar = () => {
   return (
     <aside className="w-60 flex-shrink-0 bg-[#161b22] border-r border-[#30363d] flex flex-col h-full">
 
-      {/* Logo */}
       <div className="px-5 py-5 border-b border-[#30363d]">
         <h2 className="text-xl font-bold text-white tracking-tight">
           Code<span className="text-blue-400">Mate</span>
@@ -44,7 +43,6 @@ const Sidebar = () => {
         <p className="text-[11px] text-gray-500 mt-0.5">AI Code Review</p>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map(({ path, label, Icon }) => (
           <NavLink
@@ -67,7 +65,6 @@ const Sidebar = () => {
           </NavLink>
         ))}
 
-        {/* Divider */}
         <div className="pt-2 mt-2 border-t border-[#30363d]">
           <NavLink
             to="/settings"
@@ -89,7 +86,6 @@ const Sidebar = () => {
         </div>
       </nav>
 
-      {/* User + Logout */}
       <div className="px-3 py-4 border-t border-[#30363d]">
         {user && (
           <div className="flex items-center gap-3 px-3 py-2 mb-1">

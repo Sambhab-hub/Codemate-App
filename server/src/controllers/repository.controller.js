@@ -3,11 +3,6 @@
 const repositoryService = require('../services/repository.service');
 const asyncHandler = require('../utils/asyncHandler');
 
-/**
- * Repository Controllers — HTTP layer for repository management.
- */
-
-// GET /api/repositories/github-remote — Fetch remote GitHub repos available to user
 const getRemoteRepos = asyncHandler(async (req, res) => {
   const repos = await repositoryService.fetchRemoteGitHubRepos(req.user.userId);
   res.json({
@@ -16,7 +11,6 @@ const getRemoteRepos = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/repositories — Get all tracked repositories in CodeMate
 const getTrackedRepos = asyncHandler(async (req, res) => {
   const repos = await repositoryService.getTrackedRepos(req.user.userId);
   res.json({
@@ -25,7 +19,6 @@ const getTrackedRepos = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/repositories — Track a new repository
 const trackRepo = asyncHandler(async (req, res) => {
   const repo = await repositoryService.trackRepo(req.user.userId, req.body);
   res.status(201).json({
@@ -34,7 +27,6 @@ const trackRepo = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/repositories/:id — Get details of a single tracked repository
 const getRepoById = asyncHandler(async (req, res) => {
   const repo = await repositoryService.getTrackedRepoById(req.user.userId, req.params.id);
   res.json({
@@ -43,7 +35,6 @@ const getRepoById = asyncHandler(async (req, res) => {
   });
 });
 
-// DELETE /api/repositories/:id — Untrack a repository
 const untrackRepo = asyncHandler(async (req, res) => {
   const result = await repositoryService.untrackRepo(req.user.userId, req.params.id);
   res.json({

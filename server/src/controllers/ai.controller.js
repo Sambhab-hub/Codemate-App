@@ -8,11 +8,6 @@ const { addReviewJob } = require('../queues/review.queue');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 
-/**
- * AI Controllers — HTTP handlers for AI Code Reviews and Bug Analysis.
- */
-
-// POST /api/ai/review — Trigger AI review for a Pull Request (Supports Async Queue & Direct Fallback)
 const createPRReview = asyncHandler(async (req, res) => {
   const { pullRequestId } = req.body;
   const userId = req.user.userId;
@@ -21,10 +16,8 @@ const createPRReview = asyncHandler(async (req, res) => {
     throw new AppError('pullRequestId is required.', 400);
   }
 
-  // 1. Fetch Pull Request details from DB to verify ownership
   const pr = await pullRequestService.getPullRequestById(userId, pullRequestId);
 
-  // 2. Create initial pending review document in MongoDB
   const review = await AIReview.create({
     userId,
     repositoryId: pr.repositoryId._id,
@@ -33,7 +26,6 @@ const createPRReview = asyncHandler(async (req, res) => {
     status: 'pending',
   });
 
-  // 3. Attempt to queue job in BullMQ
   const jobId = await addReviewJob({
     reviewId: review._id.toString(),
     userId,
@@ -51,7 +43,6 @@ const createPRReview = asyncHandler(async (req, res) => {
     });
   }
 
-  // Fallback: Direct processing if Redis queue is not active locally
   try {
     review.status = 'processing';
     await review.save();
@@ -89,7 +80,6 @@ const createPRReview = asyncHandler(async (req, res) => {
   }
 });
 
-// GET /api/ai/reviews — List past AI reviews for the authenticated user
 const getUserReviews = asyncHandler(async (req, res) => {
   const reviews = await AIReview.find({ userId: req.user.userId })
     .populate('repositoryId', 'name owner fullName')
@@ -102,7 +92,6 @@ const getUserReviews = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/ai/reviews/:id — Get single AI review details
 const getReviewById = asyncHandler(async (req, res) => {
   const review = await AIReview.findOne({ _id: req.params.id, userId: req.user.userId })
     .populate('repositoryId', 'name owner fullName')
@@ -118,9 +107,6 @@ const getReviewById = asyncHandler(async (req, res) => {
   });
 });
 
-// ── BUG ASSISTANT CONTROLLERS ──────────────────────────────────────────────────
-
-// POST /api/ai/bug-analysis — Analyze a bug description
 const createBugAnalysis = asyncHandler(async (req, res) => {
   const { description } = req.body;
   const userId = req.user.userId;
@@ -148,7 +134,6 @@ const createBugAnalysis = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /api/ai/bug-analysis — List past bug analyses for the user
 const getUserBugAnalyses = asyncHandler(async (req, res) => {
   const analyses = await BugAnalysis.find({ userId: req.user.userId }).sort({ createdAt: -1 });
   res.json({

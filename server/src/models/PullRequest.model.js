@@ -2,16 +2,6 @@
 
 const mongoose = require('mongoose');
 
-/**
- * PullRequest Model
- *
- * Stores a snapshot of PR metadata when a user views or reviews a PR.
- * The actual code diff is always fetched fresh from GitHub at review time —
- * we don't store diffs because they can be megabytes in size and go stale.
- *
- * COMPOUND UNIQUE INDEX:
- * { repositoryId, githubPullRequestId } — a PR can only be stored once per repo.
- */
 const PullRequestSchema = new mongoose.Schema(
   {
     repositoryId: {
@@ -23,7 +13,7 @@ const PullRequestSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    // The PR number shown on GitHub (e.g. #42)
+
     number: {
       type: Number,
       required: true,
@@ -34,7 +24,7 @@ const PullRequestSchema = new mongoose.Schema(
       trim: true,
     },
     author: {
-      type: String, // GitHub username of the PR author
+      type: String, 
       trim: true,
     },
     state: {
@@ -43,15 +33,15 @@ const PullRequestSchema = new mongoose.Schema(
       default: 'open',
     },
     sourceBranch: {
-      type: String, // "feature/login"
+      type: String, 
       trim: true,
     },
     targetBranch: {
-      type: String, // "main"
+      type: String, 
       trim: true,
     },
     url: {
-      type: String, // GitHub URL to the PR
+      type: String, 
     },
   },
   {

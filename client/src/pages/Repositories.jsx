@@ -3,11 +3,8 @@ import { Link } from 'react-router-dom';
 import { FolderIcon, PlusIcon, GitHubIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * Repositories page — manage tracked repositories & import from GitHub.
- */
 const Repositories = () => {
-  const [activeTab, setActiveTab] = useState('tracked'); // 'tracked' | 'import'
+  const [activeTab, setActiveTab] = useState('tracked'); 
   const [trackedRepos, setTrackedRepos] = useState([]);
   const [remoteRepos, setRemoteRepos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +14,6 @@ const Repositories = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [isGitHubConnected, setIsGitHubConnected] = useState(true);
 
-  // Fetch tracked repositories
   const fetchTrackedRepos = async () => {
     try {
       setLoading(true);
@@ -30,7 +26,6 @@ const Repositories = () => {
     }
   };
 
-  // Fetch remote GitHub repositories
   const fetchRemoteRepos = async () => {
     try {
       setRemoteLoading(true);
@@ -60,7 +55,6 @@ const Repositories = () => {
     }
   };
 
-  // Track a new repository
   const handleTrackRepo = async (repo) => {
     try {
       setActionId(repo.githubRepositoryId);
@@ -75,7 +69,6 @@ const Repositories = () => {
     }
   };
 
-  // Untrack a repository
   const handleUntrackRepo = async (repoId, name) => {
     if (!window.confirm(`Are you sure you want to stop tracking "${name}"?`)) return;
 
@@ -104,7 +97,6 @@ const Repositories = () => {
           <p className="text-gray-500 text-sm mt-1">Manage connected GitHub repositories.</p>
         </div>
 
-        {/* Tab switch buttons */}
         <div className="flex bg-[#161b22] border border-[#30363d] p-1 rounded-lg self-start sm:self-auto">
           <button
             onClick={() => handleTabChange('tracked')}
@@ -130,7 +122,6 @@ const Repositories = () => {
         </div>
       </div>
 
-      {/* Success alert */}
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex justify-between items-center">
           <span>{successMsg}</span>
@@ -138,7 +129,6 @@ const Repositories = () => {
         </div>
       )}
 
-      {/* Error alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -146,7 +136,6 @@ const Repositories = () => {
         </div>
       )}
 
-      {/* ── TAB 1: TRACKED REPOSITORIES ───────────────────────────────────── */}
       {activeTab === 'tracked' && (
         <>
           {loading ? (
@@ -232,7 +221,6 @@ const Repositories = () => {
         </>
       )}
 
-      {/* ── TAB 2: IMPORT FROM GITHUB ────────────────────────────────────── */}
       {activeTab === 'import' && (
         <>
           {!isGitHubConnected ? (

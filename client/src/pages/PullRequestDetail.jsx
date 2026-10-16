@@ -3,9 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { PullRequestIcon, SparklesIcon, GitHubIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * Code Diff Block — displays git patch lines with syntax highlighting colors for diffs.
- */
 const PatchDiffViewer = ({ patch }) => {
   if (!patch) {
     return <p className="text-xs text-gray-500 italic p-3">Binary file or no patch available.</p>;
@@ -35,9 +32,6 @@ const PatchDiffViewer = ({ patch }) => {
   );
 };
 
-/**
- * Pull Request Detail Page — inspect PR details, changed files, and git code diff patches.
- */
 const PullRequestDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -82,7 +76,7 @@ const PullRequestDetail = () => {
   }, [pr, id]);
 
   const handleRunAIReview = () => {
-    // Navigates to AI Review page passing the selected PR in navigation state or query
+
     navigate(`/ai-review?prId=${id}`);
   };
 
@@ -110,7 +104,7 @@ const PullRequestDetail = () => {
 
   return (
     <div className="max-w-5xl space-y-6">
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#30363d] pb-5">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -150,7 +144,6 @@ const PullRequestDetail = () => {
         </div>
       </div>
 
-      {/* Branch & Meta Panel */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-gray-400">
         <div className="flex items-center gap-2">
           <span>Branches:</span>
@@ -163,7 +156,6 @@ const PullRequestDetail = () => {
         </div>
       </div>
 
-      {/* Changed Files & Code Diff Viewer */}
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-white">Changed Files & Code Diff</h3>
 
@@ -180,7 +172,7 @@ const PullRequestDetail = () => {
           <div className="space-y-4">
             {files.map((file, idx) => (
               <div key={idx} className="bg-[#161b22] border border-[#30363d] rounded-xl overflow-hidden">
-                {/* File Header */}
+
                 <div className="px-4 py-3 bg-[#21262d] flex items-center justify-between text-xs font-mono">
                   <span className="text-gray-200 font-medium">{file.filename}</span>
                   <div className="flex items-center gap-3">
@@ -192,7 +184,6 @@ const PullRequestDetail = () => {
                   </div>
                 </div>
 
-                {/* Diff Viewer */}
                 <PatchDiffViewer patch={file.patch} />
               </div>
             ))}

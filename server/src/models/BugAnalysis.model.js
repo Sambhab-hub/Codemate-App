@@ -2,17 +2,6 @@
 
 const mongoose = require('mongoose');
 
-/**
- * BugAnalysis Model
- *
- * Stores the result of the AI Bug Assistant.
- * The user describes a bug in plain text, the AI returns structured analysis.
- *
- * WHY STORE IT?
- * - User can reference past analyses
- * - Dashboard can show "recent bug analyses"
- * - Good data to show in demos
- */
 const BugAnalysisSchema = new mongoose.Schema(
   {
     userId: {
@@ -20,7 +9,7 @@ const BugAnalysisSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    // What the user typed
+
     description: {
       type: String,
       required: [true, 'Bug description is required'],
@@ -28,7 +17,6 @@ const BugAnalysisSchema = new mongoose.Schema(
       maxlength: [5000, 'Description cannot exceed 5000 characters'],
     },
 
-    // ── AI Response Fields ─────────────────────────────────────────────────────
     severity: {
       type: String,
       enum: ['low', 'medium', 'high', 'critical'],

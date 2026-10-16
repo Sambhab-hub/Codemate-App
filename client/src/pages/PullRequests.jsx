@@ -3,20 +3,16 @@ import { Link } from 'react-router-dom';
 import { PullRequestIcon, FolderIcon, SparklesIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * Pull Requests page — view and sync open/closed pull requests across tracked repositories.
- */
 const PullRequests = () => {
   const [prs, setPrs] = useState([]);
   const [repositories, setRepositories] = useState([]);
   const [selectedRepoId, setSelectedRepoId] = useState('');
-  const [selectedState, setSelectedState] = useState('open'); // 'open' | 'closed' | 'merged' | 'all'
+  const [selectedState, setSelectedState] = useState('open'); 
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Fetch tracked repositories for dropdown
   const fetchRepositories = async () => {
     try {
       const { data } = await api.get('/repositories');
@@ -26,7 +22,6 @@ const PullRequests = () => {
     }
   };
 
-  // Fetch pull requests with filters
   const fetchPullRequests = async () => {
     try {
       setLoading(true);
@@ -52,7 +47,6 @@ const PullRequests = () => {
     fetchPullRequests();
   }, [selectedRepoId, selectedState]);
 
-  // Sync PRs from GitHub for the selected repository
   const handleSyncPRs = async () => {
     if (!selectedRepoId) {
       setError('Please select a repository to sync pull requests from GitHub.');
@@ -95,7 +89,6 @@ const PullRequests = () => {
           </p>
         </div>
 
-        {/* Sync button */}
         <button
           onClick={handleSyncPRs}
           disabled={syncing || !selectedRepoId}
@@ -109,9 +102,8 @@ const PullRequests = () => {
         </button>
       </div>
 
-      {/* Filter Toolbar */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {/* Repo Selector */}
+
         <div className="flex items-center gap-2">
           <FolderIcon className="w-4 h-4 text-gray-400" />
           <select
@@ -128,7 +120,6 @@ const PullRequests = () => {
           </select>
         </div>
 
-        {/* State Filter Tabs */}
         <div className="flex bg-[#0d1117] border border-[#30363d] p-1 rounded-lg">
           {['open', 'closed', 'merged', 'all'].map((tab) => (
             <button
@@ -146,7 +137,6 @@ const PullRequests = () => {
         </div>
       </div>
 
-      {/* Success alert */}
       {successMsg && (
         <div className="px-4 py-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex justify-between items-center">
           <span>{successMsg}</span>
@@ -154,7 +144,6 @@ const PullRequests = () => {
         </div>
       )}
 
-      {/* Error alert */}
       {error && (
         <div className="px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex justify-between items-center">
           <span>{error}</span>
@@ -162,7 +151,6 @@ const PullRequests = () => {
         </div>
       )}
 
-      {/* PR Cards List */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />

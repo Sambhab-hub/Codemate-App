@@ -3,9 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FolderIcon, PullRequestIcon, IssueIcon, SparklesIcon, GitHubIcon } from '../components/ui/Icons';
 import api from '../services/api';
 
-/**
- * Repository Detail Page — view specific repository details and quick actions.
- */
 const RepositoryDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -67,7 +64,7 @@ const RepositoryDetail = () => {
 
   return (
     <div className="max-w-4xl space-y-6">
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#30363d] pb-5">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -108,7 +105,6 @@ const RepositoryDetail = () => {
         </div>
       </div>
 
-      {/* Metadata Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4">
           <p className="text-xs text-gray-500">Language</p>
@@ -130,7 +126,6 @@ const RepositoryDetail = () => {
         </div>
       </div>
 
-      {/* Quick Action Navigation */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6">
         <h3 className="text-sm font-semibold text-gray-200 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

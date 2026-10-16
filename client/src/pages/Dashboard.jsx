@@ -5,11 +5,11 @@ import { SparklesIcon, FolderIcon, PullRequestIcon, IssueIcon, ZapIcon, BugIcon 
 import api from '../services/api';
 
 const CATEGORY_COLORS = {
-  security: '#ef4444',       // red
-  performance: '#f59e0b',    // amber
-  bug: '#eab308',            // yellow
-  quality: '#3b82f6',        // blue
-  'error-handling': '#a855f7',// purple
+  security: '#ef4444',       
+  performance: '#f59e0b',    
+  bug: '#eab308',            
+  quality: '#3b82f6',        
+  'error-handling': '#a855f7',
 };
 
 const StatCard = ({ label, value, icon: Icon, color, subtitle }) => (
@@ -74,7 +74,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 max-w-6xl">
-      {/* Header */}
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">Dashboard</h2>
@@ -92,7 +92,6 @@ const Dashboard = () => {
         </Link>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           label="Tracked Repos"
@@ -127,9 +126,8 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Charts & Activity Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recharts Analytics Panel */}
+
         <div className="lg:col-span-2 bg-[#161b22] border border-[#30363d] rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between border-b border-[#30363d] pb-3">
             <h3 className="text-sm font-semibold text-gray-200">Identified Findings by Category</h3>
@@ -154,7 +152,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions Panel */}
         <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 space-y-4">
           <h3 className="text-sm font-semibold text-gray-200 border-b border-[#30363d] pb-3">Quick Navigation</h3>
           <div className="space-y-2.5">
@@ -199,7 +196,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent AI Reviews */}
       <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 space-y-4">
         <div className="flex items-center justify-between border-b border-[#30363d] pb-3">
           <h3 className="text-sm font-semibold text-gray-200">Recent AI Reviews</h3>

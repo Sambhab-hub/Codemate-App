@@ -5,38 +5,17 @@ const config = require('../config/env');
 const GitHubConnection = require('../models/GitHubConnection.model');
 const AppError = require('../utils/AppError');
 
-/**
- * GitHub Service — handles GitHub OAuth & API integration.
- *
- * GITHUB OAUTH FLOW:
- * 1. User clicks "Connect GitHub" → redirected to getAuthorizationUrl()
- * 2. User authorizes app on GitHub → GitHub redirects to callback with a temporary `code`
- * 3. Server calls exchangeCodeForToken(code) → gets GitHub access token
- * 4. Server calls getGitHubUserProfile(token) → gets GitHub user ID, username, avatar
- * 5. Server stores or updates GitHubConnection document linked to userId
- */
-
-/**
- * Generate GitHub OAuth Authorization URL
- *
- * SCOPES REQUIRED:
- * - `repo`: Full control of private repositories (read/write PRs, issues, commits)
- * - `user`: Read user profile data
- */
 const getAuthorizationUrl = (userId) => {
   const params = new URLSearchParams({
     client_id: config.github.clientId,
     redirect_uri: config.github.callbackUrl,
     scope: 'repo user',
-    state: userId, // Pass userId as state to maintain context through OAuth redirect
+    state: userId, 
   });
 
   return `https://github.com/login/oauth/authorize?${params.toString()}`;
 };
 
-/**
- * Exchange temporary OAuth code for GitHub access token.
- */
 const exchangeCodeForToken = async (code) => {
   try {
     const response = await axios.post(
@@ -68,9 +47,6 @@ const exchangeCodeForToken = async (code) => {
   }
 };
 
-/**
- * Fetch authenticated GitHub user profile using access token.
- */
 const getGitHubUserProfile = async (accessToken) => {
   try {
     const response = await axios.get('https://api.github.com/user', {
@@ -91,11 +67,8 @@ const getGitHubUserProfile = async (accessToken) => {
   }
 };
 
-/**
- * Save or update GitHub connection in database.
- */
 const saveGitHubConnection = async (userId, { accessToken, scope, githubUserId, githubUsername, githubAvatarUrl }) => {
-  // Check if this GitHub account is already connected to another user
+
   const existingOther = await GitHubConnection.findOne({
     githubUserId,
     userId: { $ne: userId },
@@ -121,9 +94,6 @@ const saveGitHubConnection = async (userId, { accessToken, scope, githubUserId, 
   return connection;
 };
 
-/**
- * Get GitHub connection status for a user.
- */
 const getConnectionStatus = async (userId) => {
   const connection = await GitHubConnection.findOne({ userId });
   if (!connection) {
@@ -139,9 +109,6 @@ const getConnectionStatus = async (userId) => {
   };
 };
 
-/**
- * Disconnect GitHub account.
- */
 const disconnect = async (userId) => {
   await GitHubConnection.deleteOne({ userId });
   return { connected: false };

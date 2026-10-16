@@ -4,22 +4,12 @@ const { GoogleGenAI } = require('@google/genai');
 const config = require('../config/env');
 const AppError = require('../utils/AppError');
 
-/**
- * AI Service — handles Google Gemini API integration, prompt engineering, and response validation.
- */
-
-// Initialize Gemini client if API key is provided
 let geminiClient = null;
 const apiKey = config.gemini.apiKey;
 if (apiKey && apiKey !== 'your_gemini_api_key_here' && apiKey !== 'your_openai_api_key_here') {
   geminiClient = new GoogleGenAI({ apiKey });
 }
 
-// ── PROMPT ENGINEERING ─────────────────────────────────────────────────────────
-
-/**
- * System prompt instructing Gemini to act as a Principal Code Reviewer & Security Auditor.
- */
 const PR_REVIEW_SYSTEM_PROMPT = `
 You are a Principal Software Engineer and Application Security Auditor.
 Your task is to conduct a thorough code review on a GitHub Pull Request.
@@ -49,9 +39,6 @@ You MUST respond strictly with valid JSON. Do not include markdown code block fo
 }
 `.trim();
 
-/**
- * System prompt instructing Gemini to conduct root-cause bug analysis.
- */
 const BUG_ANALYSIS_SYSTEM_PROMPT = `
 You are a Staff Debugging Expert and System Architect.
 Your task is to analyze a developer's bug description and determine probable root causes, severity, recommended fixes, and test cases.
@@ -68,8 +55,6 @@ You MUST respond strictly with valid JSON. Do not include markdown code block fo
   ]
 }
 `.trim();
-
-// ── MOCK FALLBACK GENERATORS (for dev testing without API key) ─────────────────
 
 const generateMockPRReview = (prDetails, files) => {
   const fileCount = files ? files.length : 1;
@@ -124,8 +109,6 @@ const generateMockBugAnalysis = (description) => {
   };
 };
 
-// ── GEMINI API HELPER ──────────────────────────────────────────────────────────
-
 const callGeminiWithFallback = async (client, params) => {
   const modelsToTry = [
     config.gemini.model,
@@ -163,11 +146,6 @@ const callGeminiWithFallback = async (client, params) => {
   throw lastError;
 };
 
-// ── CORE SERVICE FUNCTIONS ─────────────────────────────────────────────────────
-
-/**
- * Run AI Code Review on Pull Request files using Gemini.
- */
 const analyzePRCode = async (prDetails, files) => {
   if (!geminiClient) {
     console.log('ℹ️  Gemini API key not set — generating structured mock PR review');
